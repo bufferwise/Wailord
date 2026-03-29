@@ -1,3 +1,5 @@
+# [Mail](mailto:buffer@outlook.in) or Join [discord server](https://discord.gg/26MMXRHgZB) for discussions.
+
 ![Zeppelin Banner](assets/zepbanner.png)
 # Zeppelin
 Zeppelin is a moderation bot for Discord, designed with large servers and reliability in mind.
