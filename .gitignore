@@ -92,3 +92,8 @@ config-errors.txt
 # Legacy data folders
 /docker/development/data
 /docker/production/data
+
+# Config files
+complete_plugin_config.yaml
+example.yaml
+config.yaml

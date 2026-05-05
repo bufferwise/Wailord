@@ -39,13 +39,13 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
       member: memberToTemplateSafeMember(member),
       user: userToTemplateSafeUser(member.user),
       guild: guildToTemplateSafeGuild(member.guild),
-      userMention: (inputUser) => {
+      userMention: (inputUser, format = "verbose") => {
         if (!inputUser) return "";
-        return verboseUserMention(inputUser);
+        return format === "simple" ? `<@${inputUser.id}>` : verboseUserMention(inputUser);
       },
-      channelMention: (inputChannel) => {
+      channelMention: (inputChannel, format = "verbose") => {
         if (!inputChannel) return "";
-        return verboseChannelMention(inputChannel);
+        return format === "simple" ? `<#${inputChannel.id}>` : verboseChannelMention(inputChannel);
       },
     });
 

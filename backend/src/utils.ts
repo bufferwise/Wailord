@@ -1444,7 +1444,7 @@ export async function renderRecursively(value, fn: RecursiveRenderFn) {
     for (const [prop, _value] of Object.entries(value)) {
       const rendered = await renderRecursively(_value, fn);
       if (prop === "color" && typeof rendered === "string") {
-        const parsedColor = parseInt(rendered, 10);
+        const parsedColor = rendered.startsWith("0x") ? parseInt(rendered, 16) : parseInt(rendered, 10);
         result[prop] = isNaN(parsedColor) ? rendered : parsedColor;
       } else {
         result[prop] = rendered;

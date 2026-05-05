@@ -36,10 +36,14 @@ services:
       context: .
       dockerfile: docker/production/nginx/Dockerfile
     ports:
+      - "80:80"
       - "${STANDALONE_WEB_PORT:?Missing STANDALONE_WEB_PORT}:443"
+    volumes:
+      - /etc/letsencrypt/live/buffwr.duckdns.org/fullchain.pem:/etc/ssl/certs/buffwr.pem:ro
+      - /etc/letsencrypt/live/buffwr.duckdns.org/privkey.pem:/etc/ssl/private/buffwr.key:ro
 
   migrate:
-    image: dragory/zeppelin
+    build: .
     depends_on:
       mysql:
         condition: service_healthy
@@ -57,7 +61,7 @@ services:
     command: ["npm", "run", "migrate-prod"]
 
   api:
-    image: dragory/zeppelin
+    build: .
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -69,7 +73,7 @@ services:
     command: ["npm", "run", "start-api-prod"]
 
   bot:
-    image: dragory/zeppelin
+    build: .
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -79,9 +83,9 @@ services:
       - .env
     working_dir: /zeppelin/backend
     command: ["npm", "run", "start-bot-prod"]
-  
+
   dashboard:
-    image: dragory/zeppelin
+    build: .
     depends_on:
       migrate:
         condition: service_completed_successfully

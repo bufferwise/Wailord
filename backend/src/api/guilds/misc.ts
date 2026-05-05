@@ -14,6 +14,7 @@ import { loadYamlSafely } from "../../utils/loadYamlSafely.js";
 import { ObjectAliasError } from "../../utils/validateNoObjectAliases.js";
 import { hasGuildPermission, requireGuildPermission } from "../permissions.js";
 import { clientError, ok, serverError, unauthorized } from "../responses.js";
+import { isStaff } from "../../staff.js";
 
 const apiPermissionAssignments = new ApiPermissionAssignments();
 const auditLog = new ApiAuditLog();
@@ -25,14 +26,33 @@ export function initGuildsMiscAPI(router: express.Router) {
   const miscRouter = express.Router();
 
   miscRouter.get("/available", async (req: Request, res: Response) => {
-    const guilds = await allowedGuilds.getForApiUser(req.user!.userId);
+    let guilds;
+    if (isStaff(req.user!.userId)) {
+      guilds = await allowedGuilds.getAll();
+    } else {
+      guilds = await allowedGuilds.getForApiUser(req.user!.userId);
+    }
     res.json(guilds);
   });
 
   miscRouter.get(
     "/my-permissions", // a
     async (req: Request, res: Response) => {
-      const permissions = await apiPermissionAssignments.getByUserId(req.user!.userId);
+      let permissions = await apiPermissionAssignments.getByUserId(req.user!.userId);
+      if (isStaff(req.user!.userId)) {
+        const allGuilds = await allowedGuilds.getAll();
+        const staffPermissions = allGuilds.map((guild) => ({
+          guild_id: guild.id,
+          target_id: req.user!.userId,
+          type: ApiPermissionTypes.User,
+          permissions: [ApiPermissions.Owner],
+          expires_at: null,
+        })) as any[];
+
+        // Merge existing permissions with staff permissions (staff permissions take precedence/additive)
+        // Actually, just returning staffPermissions for all guilds is cleaner as they are OWNER anyway
+        permissions = staffPermissions;
+      }
       res.json(permissions);
     },
   );

@@ -31,6 +31,10 @@ export class AllowedGuilds extends BaseRepository {
     });
   }
 
+  getAll() {
+    return this.allowedGuilds.find();
+  }
+
   getForApiUser(userId: string) {
     return this.allowedGuilds
       .createQueryBuilder("allowed_guilds")
