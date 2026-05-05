@@ -39,6 +39,14 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
       member: memberToTemplateSafeMember(member),
       user: userToTemplateSafeUser(member.user),
       guild: guildToTemplateSafeGuild(member.guild),
+      userMention: (inputUser) => {
+        if (!inputUser) return "";
+        return verboseUserMention(inputUser);
+      },
+      channelMention: (inputChannel) => {
+        if (!inputChannel) return "";
+        return verboseChannelMention(inputChannel);
+      },
     });
 
     const renderMessageText = (str: string) => renderTemplate(str, templateValues);

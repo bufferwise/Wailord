@@ -209,7 +209,7 @@ export const zEmbedInput = z
     description: z.string().optional(),
     url: z.string().optional(),
     timestamp: z.string().optional(),
-    color: z.number().optional(),
+    color: z.union([z.number(), z.string()]).optional(),
 
     footer: z.optional(
       z.object({
@@ -1442,7 +1442,13 @@ export async function renderRecursively(value, fn: RecursiveRenderFn) {
   } else if (typeof value === "object") {
     const result = {};
     for (const [prop, _value] of Object.entries(value)) {
-      result[prop] = await renderRecursively(_value, fn);
+      const rendered = await renderRecursively(_value, fn);
+      if (prop === "color" && typeof rendered === "string") {
+        const parsedColor = parseInt(rendered, 10);
+        result[prop] = isNaN(parsedColor) ? rendered : parsedColor;
+      } else {
+        result[prop] = rendered;
+      }
     }
     return result;
   } else if (typeof value === "string") {
